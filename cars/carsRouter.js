@@ -30,4 +30,34 @@ router.post("/", (req, res) => {
     });
 });
 
+// GET a car by id
+router.get("/:id", (req, res) => {
+  const carId = req.params.id;
+
+  db("cars")
+    .where({ id: carId })
+    .then((car) => {
+      res.status(200).json({ car: car });
+    })
+    .catch((error) => {
+      res.status(500).json({ error: error.message });
+    });
+});
+
+// Update (PUT) a car by id
+router.put("/:id", (req, res) => {
+  const carChanges = req.body;
+  const carId = req.params.id;
+
+  db("cars")
+    .where({ id: carId })
+    .update(carChanges, ["id", "vin", "make", "model"])
+    .then((count) => {
+      res.status(200).json({ updatedRecords: count });
+    })
+    .catch((error) => {
+      res.status(500).json({ error: error.message });
+    });
+});
+
 module.exports = router;
