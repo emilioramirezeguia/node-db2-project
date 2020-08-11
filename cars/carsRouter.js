@@ -15,7 +15,7 @@ router.get("/", (req, res) => {
     });
 });
 
-// POST a new car
+// Create (POST) new car
 router.post("/", (req, res) => {
   const car = req.body;
 
@@ -30,21 +30,27 @@ router.post("/", (req, res) => {
     });
 });
 
-// GET a car by id
+// GET car by id
 router.get("/:id", (req, res) => {
   const carId = req.params.id;
 
   db("cars")
     .where({ id: carId })
     .then((car) => {
-      res.status(200).json({ car: car });
+      if (car.length) {
+        res.status(200).json({ car: car });
+      } else {
+        res.status(404).json({
+          message: "The car you're looking for doesn't exist anymore.",
+        });
+      }
     })
     .catch((error) => {
       res.status(500).json({ error: error.message });
     });
 });
 
-// Update (PUT) a car by id
+// Update (PUT) car by id
 router.put("/:id", (req, res) => {
   const carChanges = req.body;
   const carId = req.params.id;
@@ -54,6 +60,21 @@ router.put("/:id", (req, res) => {
     .update(carChanges, ["id", "vin", "make", "model"])
     .then((count) => {
       res.status(200).json({ updatedRecords: count });
+    })
+    .catch((error) => {
+      res.status(500).json({ error: error.message });
+    });
+});
+
+// Delete car
+router.delete("/:id", (req, res) => {
+  const cardId = req.params.id;
+
+  db("cars")
+    .where({ id: cardId })
+    .del()
+    .then((count) => {
+      res.status(200).json({ deletedRecords: count });
     })
     .catch((error) => {
       res.status(500).json({ error: error.message });
