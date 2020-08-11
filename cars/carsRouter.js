@@ -66,7 +66,7 @@ router.put("/:id", (req, res) => {
     });
 });
 
-// Delete car
+// DELETE car
 router.delete("/:id", (req, res) => {
   const cardId = req.params.id;
 
@@ -75,6 +75,24 @@ router.delete("/:id", (req, res) => {
     .del()
     .then((count) => {
       res.status(200).json({ deletedRecords: count });
+    })
+    .catch((error) => {
+      res.status(500).json({ error: error.message });
+    });
+});
+
+// GET sales for a car by id
+router.get("/:id/sales", (req, res) => {
+  const carId = req.params.id;
+
+  db("sales")
+    .where({ car_id: carId })
+    .then((sales) => {
+      if (sales.length) {
+        res.status(200).json({ carSales: sales });
+      } else {
+          res.status(404).json({message: "This car hasn't been sold yet. :("})
+      }
     })
     .catch((error) => {
       res.status(500).json({ error: error.message });
